@@ -3,7 +3,7 @@ exports.up = function (knex) {
         table.increments('id').primary();
         table.string('product_name');
         table.string('product_description');
-        table.string('product_cost');
+        table.integer('product_cost');
         table.string('product_color');
         table.string('product_brand');
         table.timestamps(true, true);

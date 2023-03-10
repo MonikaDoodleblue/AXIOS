@@ -1,12 +1,8 @@
 const { Model } = require('objection');
 
 class merchant extends Model {
-    static get tableName() {
-        return 'merchanttable';
-    }
+  static get tableName() {
+    return 'merchanttable';
+  }
 }
-
-module.exports = function (knex) {
-    merchant.knex(knex);
-    return merchant;
-};
+module.exports = merchant

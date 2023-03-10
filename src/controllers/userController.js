@@ -1,29 +1,81 @@
 const userService = require('../services/userService');
 
-function UserController() {
+function UserController() { }
 
-    UserController.prototype.createUser = async function (req, res) {
-        const { name, email, password } = req.body;
+UserController.prototype.createUser = async function (req, res) {
+    const { name, email, password, address, phoneNo } = req.body;
 
-        try {
-            const user = await userService.createUser(name, email, password);
-            res.status(200).json(user);
-        } catch (error) {
-            res.status(400).json({ error: error.message });
+    try {
+        const user = await userService.createUser(name, email, password, address, phoneNo);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+UserController.prototype.loginUser = async function (req, res) {
+    const { email, password } = req.body;
+
+    try {
+        const user = await userService.loginUser(email, password);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+UserController.prototype.getAllProducts = async function (req, res) {
+    try {
+        const products = await userService.getAllProducts();
+        res.status(200).json({ products });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while fetching products.' });
+    }
+};
+
+UserController.prototype.createOrder = async function (req, res) {
+    try {
+        const { product_id, order_quantity, user_id } = req.body;
+        const userPlacedOrder = await userService.createOrder({
+            product_id,
+            order_quantity,
+            user_id
+        });
+        res.status(200).json(userPlacedOrder);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+UserController.prototype.myOrder = async function (req, res) {
+    try {
+        const { id, order_date } = req.query;
+        const orders = await userService.myOrder(id, order_date);
+        if (orders.length === 0) {
+            res.status(404).json({ message: 'Order not found' });
+        } else {
+            res.status(200).json({ orders });
         }
-    };
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while fetching the orders', error });
+    }
+};
 
-    UserController.prototype.loginUser = async function (req, res) {
-        const { email, password } = req.body;
-
-        try {
-            const user = await userService.loginAdmin(email, password);
-            res.status(200).json(user);
-        } catch (error) {
-            res.status(401).json({ message: error.message });
+UserController.prototype.orderHistory = async function (req, res) {
+    try {
+        const id = req.params.id;
+        const history = await userService.orderHistory(id);
+        if (!history) {
+            res.status(500).json({ message: 'not found' });
+        } else {
+            res.status(200).json({ history });
         }
-    };
-
-}
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while fetching the orders.' });
+    }
+};
 
 module.exports = new UserController();

@@ -1,13 +1,14 @@
 const router = require('express').Router();
 const adminController = require('../controllers/adminController');
-//const { auth } = require('../middleware/auth');
+const { authAdmin } = require('../middleware/auth');
+const { joiLogin, register } = require('../validate/joivalidation');
 
-router.post('/login', adminController.loginAdmin);
+router.post('/login', joiLogin, adminController.loginAdmin);
 
-router.post('/register', adminController.createAdmin);
+router.post('/register', register, adminController.createAdmin);
 
-router.post('/merchant/register', adminController.createMerchant);
+router.post('/create', authAdmin, register, adminController.createMerchant);
 
-router.post('/merchant/login', adminController.loginMerchant);
+router.post('/delivery', authAdmin, register, adminController.createDelivery);
 
 module.exports = router;

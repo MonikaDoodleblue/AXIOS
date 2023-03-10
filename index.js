@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+require('./src/config/db')
+
 app.use(bodyParser.json());
 const dotenv = require('dotenv');
 dotenv.config();
@@ -13,5 +15,4 @@ routes(app)
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
-  console.log("Database connected successfully");
 });

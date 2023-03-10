@@ -1,95 +1,86 @@
 const bcrypt = require('bcrypt');
-const adminModel = require('../models/adminModel')(require('../config/db'));
-const merchantModel = require('../models/merchantModel')(require('../config/db'));
-const joiSchema = require('../validate/joivalidation');
-//const { generateToken } = require('../middleware/auth');
+const adminModel = require('../models/adminModel')
+const merchantModel = require('../models/merchantModel')
+const deliveryModel = require('../models/deliveryModel')
+const { generateTokenAdmin } = require('../middleware/auth');
 
-function AdminService() {
+function AdminService() { }
 
-    AdminService.prototype.createAdmin = async function (name, email, password) {
-        const { error } = joiSchema.validate({ name, email, password });
-
-        if (error) {
-            throw new Error(error.details[0].message);
-        }
-
-        try {
+AdminService.prototype.createAdmin = async function (name, email, password, role, next) {
+    try {
+        if (role == 'admin') {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-            const admin = await adminModel.query().insert({ name, email, password: hashedPassword });
-
+            const admin = await adminModel.query().insert({ name, email, password: hashedPassword, role });
             return admin;
-        } catch (error) {
-            console.log(error);
-            throw new Error('Unable to create admin.');
         }
-    };
+        else if (role !== 'admin') {
+            return 'Role must be admin.';
+        }
 
-    AdminService.prototype.loginAdmin = async function (email, password) {
-        try {
-            const admin = await adminModel.query().where('email', email).first();
+    } catch (error) {
+        throw new Error('Unable to create admin.');
+    }
+};
 
-            if (!admin) {
-                throw new Error('Invalid email or password.');
-            }
-
+AdminService.prototype.loginAdmin = async function (email, password, role) {
+    try {
+        if (role == 'admin') {
+            const admin = await adminModel.query().where({ 'email': email, 'role': role }).first();
             const passwordMatch = await bcrypt.compare(password, admin.password);
 
             if (!passwordMatch) {
                 throw new Error('Invalid email or password.');
             }
 
-            // const token = generateToken(admin);
-            // return { id: admin.id, name: admin.name, email: admin.email, token };
-
-        } catch (error) {
-            console.log(error);
-            throw new Error('Unable to login admin.');
+            const token = generateTokenAdmin(admin);
+            return { id: admin.id, name: admin.name, email: admin.email, token };
         }
-    };
-
-    AdminService.prototype.createMerchant = async function (name, email, password) {
-        const { error } = joiSchema.validate({ name, email, password });
-
-        if (error) {
-            throw new Error(error.details[0].message);
+        else {
+            return 'role must be admin';
         }
+    } catch (error) {
+        console.log(error);
+        throw new Error('Unable to login admin.');
+    }
+};
 
-        try {
+AdminService.prototype.createMerchant = async function (name, email, password, role) {
+    try {
+        if (role == 'merchant') {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-            const merchant = await merchantModel.query().insert({ name, email, password: hashedPassword });
+            const merchant = await merchantModel.query().insert({ name, email, password: hashedPassword, role });
 
             return merchant;
-        } catch (error) {
-            console.log(error);
-            throw new Error('Unable to create merchant.');
         }
-    };
-
-    AdminService.prototype.loginMerchant = async function (email, password) {
-        try {
-            const merchant = await merchantModel.query().where('email', email).first();
-
-            if (!merchant) {
-                throw new Error('Invalid email or password.');
-            }
-
-            const passwordMatch = await bcrypt.compare(password, merchant.password);
-
-            if (!passwordMatch) {
-                throw new Error('Invalid email or password.');
-            }
-
-            return { id: merchant.id, name: merchant.name, email: merchant.email };
-        } catch (error) {
-            console.log(error);
-            throw new Error('Unable to login merchant.');
+        else if (role !== 'merchant') {
+            return 'Role must be merchant'
         }
-    };
+    } catch (error) {
+        console.log(error);
+        throw new Error('Unable to create merchant.');
+    }
+};
 
-}
+AdminService.prototype.createDelivery = async function (name, email, password, role) {
+    try {
+        if (role == 'delivery') {
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+            const delivery = await deliveryModel.query().insert({ name, email, password: hashedPassword, role });
+
+            return delivery;
+        }
+        else if (role !== 'delivery') {
+            return 'Role must be delivery'
+        }
+    } catch (error) {
+        console.log(error);
+        throw new Error('Unable to create delivery.');
+    }
+};
 
 module.exports = new AdminService();

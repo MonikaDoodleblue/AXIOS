@@ -2,6 +2,18 @@ const merchantService = require('../services/merchantService');
 
 function MerchantController() { }
 
+MerchantController.prototype.loginMerchant = async function (req, res) {
+    const { email, password, role } = req.body;
+
+    try {
+        const merchant = await merchantService.loginMerchant(email, password, role);
+
+        res.status(200).json(merchant);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 MerchantController.prototype.uploadProduct = async function (req, res) {
     try {
         const result = await merchantService.uploadProduct(req.files.file);
@@ -27,7 +39,7 @@ MerchantController.prototype.getProduct = async function (req, res) {
         const { id, date, product_name } = req.query;
         const product = await merchantService.getProduct(id, date, product_name);
         if (!product) {
-            res.status(404).json({ message: 'Product not found' });
+            res.status(500).json({ message: 'Product not found' });
         } else {
             res.status(200).json({ product });
         }
@@ -70,7 +82,7 @@ MerchantController.prototype.updateProduct = async function (req, res) {
         });
 
         if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(500).json({ message: 'Product not found' });
         }
 
         return res.status(200).json({ product });
@@ -87,7 +99,7 @@ MerchantController.prototype.deleteProduct = async function (req, res) {
         const isDeleted = await merchantService.deleteProduct(id);
 
         if (!isDeleted) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(500).json({ message: 'Product not found' });
         }
 
         return res.status(200).json({ message: 'Product deleted successfully' });

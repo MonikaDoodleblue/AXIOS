@@ -4,6 +4,7 @@ exports.up = function (knex) {
         table.string('name');
         table.string('email');
         table.string('password');
+        table.enu('role', ['admin', 'merchant', 'user', 'delivery']).defaultTo('user');
         table.timestamps(true, true);
     });
 };
