@@ -1,18 +1,5 @@
 const merchantService = require('../services/merchantService');
-
 function MerchantController() { }
-
-MerchantController.prototype.loginMerchant = async function (req, res) {
-    const { email, password, role } = req.body;
-
-    try {
-        const merchant = await merchantService.loginMerchant(email, password, role);
-
-        res.status(200).json(merchant);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
 
 MerchantController.prototype.uploadProduct = async function (req, res) {
     try {
@@ -93,7 +80,7 @@ MerchantController.prototype.updateProduct = async function (req, res) {
 };
 
 MerchantController.prototype.deleteProduct = async function (req, res) {
-    const { id } = req.params;
+    const { id } = req.query;
 
     try {
         const isDeleted = await merchantService.deleteProduct(id);

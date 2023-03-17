@@ -1,45 +1,10 @@
-const bcrypt = require('bcrypt');
 const moment = require('moment-timezone');
 const userModel = require('../models/userModel');
 const productModel = require('../models/productModel');
 const orderModel = require('../models/orderModel');
 const { generateCron } = require('../middleware/cron');
-const { generateTokenUser } = require('../middleware/auth');
 
 function UserService() { }
-
-UserService.prototype.createUser = async function (name, email, password, address, phoneNo, role) {
-    try {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        const user = await userModel.query().insert({ name, email, password: hashedPassword, address, phoneNo, role });
-
-        return user;
-
-    } catch (error) {
-        console.log(error);
-        throw new Error('Unable to create user.');
-    }
-};
-
-UserService.prototype.loginUser = async function (email, password) {
-    try {
-        const user = await userModel.query().where({ 'email': email }).first();
-        const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (!passwordMatch) {
-            throw new Error('Invalid email or password.');
-        }
-
-        const token = generateTokenUser(user);
-        return { id: user.id, name: user.name, email: user.email, token };
-
-    } catch (error) {
-        console.log(error);
-        throw new Error('Unable to login user.');
-    }
-};
 
 UserService.prototype.getAllProducts = async function () {
     try {
@@ -53,8 +18,6 @@ UserService.prototype.getAllProducts = async function () {
 
 UserService.prototype.createOrder = async function (order) {
     try {
-        console.log(order)
-        // Get the product details from the product table
         const product = await productModel.query()
             .select('product_name', 'product_description', 'product_cost', 'product_color', 'product_brand')
             .where('id', order.product_id)
@@ -124,14 +87,10 @@ UserService.prototype.createOrder = async function (order) {
 
 UserService.prototype.createOrder = async function (order, user_id) {
     try {
-        console.log(user_id, "=========")
-
-        // Verify that the user_id from the token matches the user_id in the order
         if (order.user_id !== user_id) {
             throw new Error('User ID does not match token.');
         }
 
-        // Get the product details from the product table
         const product = await productModel.query()
             .select('product_name', 'product_description', 'product_cost', 'product_color', 'product_brand')
             .where('id', order.product_id)

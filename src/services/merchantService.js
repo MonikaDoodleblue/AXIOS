@@ -1,31 +1,6 @@
 const productModel = require('../models/productModel');
-const merchantModel = require('../models/merchantModel');
 const xlsx = require('xlsx');
-const bcrypt = require('bcrypt');
-const { generateTokenMerchant } = require('../middleware/auth');
 function MerchantService() { }
-
-MerchantService.prototype.loginMerchant = async function (email, password, role) {
-    try {
-        if (role == 'merchant') {
-            const merchant = await merchantModel.query().where('email', email).first();
-
-            const passwordMatch = await bcrypt.compare(password, merchant.password);
-
-            if (!passwordMatch) {
-                throw new Error('Invalid email or password.');
-            }
-            const token = generateTokenMerchant(merchant);
-            return { id: merchant.id, name: merchant.name, email: merchant.email, token };
-
-        } else {
-            return 'Role must be Merchant';
-        }
-    } catch (error) {
-        console.log(error);
-        throw new Error('Unable to login merchant.');
-    }
-};
 
 MerchantService.prototype.uploadProduct = async function (file) {
     try {
@@ -55,7 +30,7 @@ MerchantService.prototype.uploadProduct = async function (file) {
 MerchantService.prototype.getAllProducts = async function () {
     try {
         const products = await productModel.query();
-        return products;
+        return products
     } catch (error) {
         console.log(error);
         throw new Error('Unable to fetch products');
@@ -78,8 +53,8 @@ MerchantService.prototype.getProduct = async function (id, date, product_name) {
             query = query.where('product_name', product_name);
         }
 
-        const products = await query.select();
-        return products;
+        const product= await query.select();
+        return product;
     } catch (error) {
         console.log(error);
         throw new Error('Unable to fetch the product');

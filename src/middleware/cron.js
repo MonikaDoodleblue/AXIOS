@@ -9,7 +9,7 @@ async function generateCron(id, otp) {
       order_id: id,
       status: "orderPlaced"
     })
-    await statusModel.query().insert({
+    await statusModel.query().insert({ 
       order_id: id,
       status: "orderShipped"
     })
@@ -18,11 +18,11 @@ async function generateCron(id, otp) {
       status: "reachedLocalHub"
     })
     task.stop();
-
   },
     {
       scheduled: true,
       timezone: 'Asia/Kolkata'
     });
 }
+
 module.exports = { generateCron };

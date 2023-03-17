@@ -1,20 +1,16 @@
 const router = require('express').Router();
 const merchantController = require('../controllers/merchantController');
-const { authMerchant } = require('../middleware/auth');
-const {joiLogin} =require('../validate/joivalidation');
 
-router.post('/login',joiLogin, merchantController.loginMerchant);
+router.post('/upload', merchantController.uploadProduct);
 
-router.post('/upload', authMerchant, merchantController.uploadProduct);
+router.post('/create', merchantController.createProduct);
 
-router.post('/create',authMerchant, merchantController.createProduct);
+router.get('/all', merchantController.getAllProducts);
 
-router.get('/all',authMerchant, merchantController.getAllProducts);
+router.get('/ids', merchantController.getProduct);
 
-router.get('/ids',authMerchant, merchantController.getProduct);
+router.put('/change/:id', merchantController.updateProduct);
 
-router.put('/change/:id',authMerchant,  merchantController.updateProduct);
-
-router.delete('/clear/:id',authMerchant,  merchantController.deleteProduct);
+router.delete('/clear/:id', merchantController.deleteProduct);
 
 module.exports = router;

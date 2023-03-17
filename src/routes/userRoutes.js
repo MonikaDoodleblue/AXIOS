@@ -1,18 +1,12 @@
 const router = require('express').Router();
 const userController = require('../controllers/userController');
-const { authUser } = require('../middleware/auth');
-const { joiLogin, register } = require('../validate/joivalidation');
 
-router.post('/login', joiLogin, userController.loginUser);
+router.get('/all', userController.getAllProducts);
 
-router.post('/register', register, userController.createUser);
+router.post('/order', userController.createOrder);
 
-router.get('/all', authUser, userController.getAllProducts);
+router.get('/myorder', userController.myOrder);
 
-router.post('/order', authUser, userController.createOrder);
-
-router.get('/myorder', authUser, userController.myOrder);
-
-router.get('/history/:id', authUser, userController.orderHistory);
+router.get('/history/:id', userController.orderHistory);
 
 module.exports = router;

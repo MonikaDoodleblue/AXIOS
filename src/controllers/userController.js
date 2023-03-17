@@ -2,28 +2,6 @@ const userService = require('../services/userService');
 
 function UserController() { }
 
-UserController.prototype.createUser = async function (req, res) {
-    const { name, email, password, address, phoneNo } = req.body;
-
-    try {
-        const user = await userService.createUser(name, email, password, address, phoneNo);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-UserController.prototype.loginUser = async function (req, res) {
-    const { email, password } = req.body;
-
-    try {
-        const user = await userService.loginUser(email, password);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
 UserController.prototype.getAllProducts = async function (req, res) {
     try {
         const products = await userService.getAllProducts();

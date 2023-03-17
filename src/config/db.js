@@ -12,4 +12,5 @@ knex
         process.exit(1)
     })
 Model.knex(knex)
+
 module.exports = knex;
